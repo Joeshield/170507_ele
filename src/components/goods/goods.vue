@@ -4,7 +4,8 @@
       <div class="menu-wrapper" ref="menuDiv">
         <ul>
           <!--current: 代表当前的-->
-          <li class="menu-item" v-for="good in goods">
+          <li class="menu-item" v-for="(good, index) in goods"
+              :class="{current: currIndex==index}" @click="clickMenuItem(index)">
             <span class="text border-1px">
               <span class="icon" v-if="good.type>=0" :class="classMap[good.type]"></span>{{good.name}}
             </span>
@@ -53,7 +54,9 @@
     data () {
       return {
         goods: [],
-        classMap: ["decrease", "discount", "guarantee", "invoice", "special"]
+        classMap: ["decrease", "discount", "guarantee", "invoice", "special"],
+        scrollY: 0,
+        tops: []
       }
     },
 
@@ -64,9 +67,10 @@
           const result = response.data
           if (result.code === 0) {
             this.goods = result.data
-            // 创建scroll对象
+            // 将回调延迟到下次 DOM 更新循环之后执行
             this.$nextTick(() => {
-              this._initScroll()
+              this._initScroll() // 初始化滚动对象
+              this._initTops() // 初始化tops数组
             })
             /*setTimeout(() => {
               this._initScroll()
@@ -79,9 +83,54 @@
     methods: {
       _initScroll () {
         // 创建左侧列表对应的scroll对象
-        new BScroll(this.$refs.menuDiv)
+        new BScroll(this.$refs.menuDiv, {
+          click: true //响应点击
+        })
         // 创建右侧列表对应的scroll对象
-        new BScroll(this.$refs.foodsDiv)
+        this.foodsScroller = new BScroll(this.$refs.foodsDiv, {
+          probeType: 3 // 标识分发scroll事件-->绑定scroll回调函数才会调用
+        })
+
+        // 监视foods列表的滚动
+        this.foodsScroller.on('scroll',  (event) => {
+          this.scrollY = Math.abs(event.y)
+          console.log(this.scrollY)
+        })
+      },
+
+      _initTops () {
+        // 准备一个空容器
+        const tops = []
+        let top = 0
+        tops.push(top)
+        const lis = this.$refs.foodsDiv.getElementsByClassName('food-list-hook')
+        Array.prototype.slice.call(lis).forEach(li => {
+          top += li.clientHeight
+          tops.push(top)
+        })
+        // 更新tops状态
+        this.tops = tops
+        console.log(tops)
+      },
+
+      clickMenuItem(index) {
+        //console.log(index)
+        // 滚动的目标li
+        const li = this.$refs.foodsDiv.getElementsByClassName('food-list-hook')[index]
+        // 平滑滚动到li
+        this.foodsScroller.scrollToElement(li, 300)
+      }
+    },
+
+    computed: {
+      currIndex () {
+        const {tops, scrollY} = this
+        // findIndex(): 每个返回true的回调所对应的index
+        // scrollY>=当前top值 && scrollY<下一个top值
+        console.log('currIndex()', tops, scrollY)
+        return tops.findIndex((top, index) => {
+          return scrollY>=top && scrollY<tops[index+1]
+        })
       }
     }
   }
