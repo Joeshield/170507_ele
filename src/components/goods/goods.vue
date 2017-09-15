@@ -127,7 +127,6 @@
         const {tops, scrollY} = this
         // findIndex(): 每个返回true的回调所对应的index
         // scrollY>=当前top值 && scrollY<下一个top值
-        console.log('currIndex()', tops, scrollY)
         return tops.findIndex((top, index) => {
           return scrollY>=top && scrollY<tops[index+1]
         })
