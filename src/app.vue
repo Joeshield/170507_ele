@@ -67,6 +67,8 @@
       width 33.3333%
       line-height 40px
       text-align center
-      .router-link-active
-        color rgb(240,20,20)
+      a
+        display block
+        &.router-link-active
+          color rgb(240,20,20)
 </style>
