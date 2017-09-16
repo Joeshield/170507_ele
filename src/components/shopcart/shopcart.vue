@@ -2,7 +2,7 @@
   <div>
     <div class="shopcart">
       <div class="content">
-        <div class="content-left">
+        <div class="content-left" @click="toggleShow">
           <div class="logo-wrapper">
             <div class="logo" :class="{highlight: totalCount>0}">
               <i class="icon-shopping_cart" :class="{highlight: totalCount>0}"></i>
@@ -19,19 +19,56 @@
         </div>
       </div>
       <div class="ball-container"></div>
-      <div class="shopcart-list"></div>
+      <transition name="fold">
+        <div class="shopcart-list" v-show="listShow">
+          <div class="list-header">
+            <h1 class="title">购物车</h1>
+            <span class="empty" @click="clearCart">清空</span>
+          </div>
+          <div class="list-content" ref="foodList">
+            <ul>
+              <li class="food" v-for="(food, index) in foods" :key="index">
+                <span class="name">{{food.name}}</span>
+                <div class="price"><span>￥{{food.price}}</span></div>
+                <div class="cartcontrol-wrapper">
+                  <cartcontrol :food="food" :updateFoodCount="updateFoodCount"></cartcontrol>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </transition>
     </div>
-    <div class="list-mask" v-show="false"></div>
+    <transition name="fade">
+      <div class="list-mask" v-show="listShow" @click="toggleShow"></div>
+    </transition>
+
   </div>
 </template>
 
 <script>
+  import BScroll from 'better-scroll'
+  import cartcontrol from '../cartcontrol/cartcontrol.vue'
+
   export default {
     props: {
       foods: Array,
       deliveryPrice: Number,
       minPrice: Number,
-      clearCart: Function
+      clearCart: Function,
+      updateFoodCount: Function
+    },
+
+    data () {
+      return {
+        isShow: false
+      }
+    },
+
+    methods: {
+      toggleShow () {
+        this.isShow = !this.isShow
+      }
     },
 
     computed: {
@@ -50,7 +87,42 @@
         } else {
           return '去结算'
         }
+      },
+
+      listShow () {
+        const {isShow, totalCount} = this
+        if(!totalCount) {
+          this.isShow = false
+          return false
+        }
+
+        /*
+        创建一个单例对象
+          创建对象后, 将对象保存
+          在创建对象前, 判断是否存在, 只有不存在才创建
+         */
+        if(isShow) {
+          //异步创建BScroll对象
+          this.$nextTick(() => {
+            console.log('-------------')
+            if(!this.scroll) {
+              this.scroll = new BScroll(this.$refs.foodList, {
+                click: true
+              })
+            } else {
+              //刷新scroll
+              this.scroll.refresh()
+            }
+
+          })
+        }
+
+        return isShow
       }
+    },
+
+    components: {
+      cartcontrol
     }
   }
 </script>
@@ -163,11 +235,11 @@
       top: 0
       z-index: -1
       width: 100%
-      transform: translate3d(0, -100%, 0)
+      transform translateY(-100%)
       &.fold-enter-active, &.fold-leave-active
-        transition: all 0.5s
+        transition transform .3s
       &.fold-enter, &.fold-leave-active
-        transform: translate3d(0, 0, 0)
+        transform translateY(0)
       .list-header
         height: 40px
         line-height: 40px
