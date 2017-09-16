@@ -34,10 +34,17 @@
 
         <div class="rating">
           <h1 class="title">商品评价</h1>
-          <div>ratingselect组件</div>
+
+          <ratingselect :rateType="rateType"
+                        :onlyContent="onlyContent"
+                        :toggleOnlyContent="toggleOnlyContent"
+                        :setRateType="setRateType"
+                        :ratings="food.ratings"
+                        :desc="{all: '全部', positive: '推荐', negative: '吐糟'}"></ratingselect>
+
           <div class="rating-wrapper">
             <ul>
-              <li class="rating-item border-1px" v-for="rating in food.ratings">
+              <li class="rating-item border-1px" v-for="rating in filterRatings">
                 <div class="user">
                   <span class="name">{{rating.username}}</span>
                   <img width="12" height="12" class="avatar" :src="rating.avatar"></div>
@@ -48,7 +55,7 @@
                 </p>
               </li>
             </ul>
-            <div class="no-rating" v-show="food.ratings.length==0">暂无评价</div>
+            <div class="no-rating" v-show="filterRatings.length==0">暂无评价</div>
           </div>
         </div>
 
@@ -61,6 +68,7 @@
   import BScroll from 'better-scroll'
   import cartcontrol from '../cartcontrol/cartcontrol.vue'
   import split from '../split/split.vue'
+  import ratingselect from '../ratingselect/ratingselect.vue'
 
   export default {
     props: {
@@ -70,7 +78,9 @@
 
     data () {
       return {
-        isShow: false
+        isShow: false,
+        onlyContent: false, //是否只显示有内容的
+        rateType: 1 // 代表评论类型 全部
       }
     },
 
@@ -88,12 +98,64 @@
             }
           })
         }
+      },
+
+      toggleOnlyContent () {// 需要传给ratingselect组件的方法
+        this.onlyContent = !this.onlyContent
+        // 异步刷新scroll
+        this.$nextTick(() => {
+          this.scroll.refresh()
+        })
+      },
+
+      setRateType (rateType) {// 需要传给ratingselect组件的方法
+        this.rateType = rateType
+        // 异步刷新scroll
+        this.$nextTick(() => {
+          this.scroll.refresh()
+        })
+      }
+    },
+
+    computed: {
+      filterRatings () {
+        const {ratings} = this.food
+        const {onlyContent, rateType} = this
+
+        return ratings.filter(rating => {
+          // onlyContent: true/false    rating.text
+            // 如果onlyContent==true  需要看rating.text.length>0
+            // 如果onlyContent==false  不需要看rating.text.length>0
+          // rateType: 0/1/2       rating.rateType
+            // 如果rateType==2: 不需要看rating.rateType==ratetype
+            // 如果ratetype!=2: 需要看rating.rateType==ratetype
+          /*if(rateType===2) {
+            if(onlyContent) {
+              return rating.text.length>0
+            } else {
+              return true
+            }
+          } else {
+            if(onlyContent) {
+              return rating.text.length>0 && rating.rateType==rateType
+            } else {
+              return rating.rateType==rateType
+            }
+          }*/
+
+          if(rateType===2) {
+            return !onlyContent || rating.text.length>0
+          } else {
+            return (!onlyContent || rating.text.length>0) && rating.rateType==rateType
+          }
+        })
       }
     },
 
     components: {
       cartcontrol,
-      split
+      split,
+      ratingselect
     }
   }
 </script>
