@@ -42,6 +42,8 @@
           </li>
         </ul>
       </div>
+      <shopcart :foods="selectedFoods" :deliveryPrice="seller.deliveryPrice"
+          :minPrice="seller.minPrice" :clearCart="clearCart"></shopcart>
     </div>
   </div>
 </template>
@@ -51,8 +53,12 @@
   import BScroll from 'better-scroll'
 
   import cartcontrol from '../cartcontrol/cartcontrol.vue'
+  import shopcart from '../shopcart/shopcart.vue'
 
   export default {
+    props: {
+      seller: Object
+    },
     data () {
       return {
         goods: [],
@@ -152,6 +158,12 @@
           }
 
         }
+      },
+
+      clearCart () {
+        this.selectedFoods.forEach(food => {
+          food.count = 0
+        })
       }
     },
 
@@ -163,11 +175,22 @@
         return tops.findIndex((top, index) => {
           return scrollY>=top && scrollY<tops[index+1]
         })
+      },
+
+      selectedFoods () {
+        const foods = []
+        this.goods.forEach(good => {
+          good.foods.forEach(food => {
+            food.count && foods.push(food)
+          })
+        })
+        return foods
       }
     },
 
     components: {
-      cartcontrol
+      cartcontrol,
+      shopcart
     }
   }
 </script>
