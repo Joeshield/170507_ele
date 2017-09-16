@@ -33,7 +33,7 @@
                     <span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
                   </div>
                   <div class="cartcontrol-wrapper">
-                    cartcontrol组件
+                    <cartcontrol :food="food" :updateFoodCount="updateFoodCount"></cartcontrol>
                   </div>
                 </div>
 
@@ -49,6 +49,8 @@
 <script>
   import axios from 'axios'
   import BScroll from 'better-scroll'
+
+  import cartcontrol from '../cartcontrol/cartcontrol.vue'
 
   export default {
     data () {
@@ -88,14 +90,22 @@
         })
         // 创建右侧列表对应的scroll对象
         this.foodsScroller = new BScroll(this.$refs.foodsDiv, {
+          click: true, //响应点击
           probeType: 3 // 标识分发scroll事件-->绑定scroll回调函数才会调用
         })
 
         // 监视foods列表的滚动
         this.foodsScroller.on('scroll',  (event) => {
-          this.scrollY = Math.abs(event.y)
-          console.log(this.scrollY)
+          if(!this.clickMenu) {
+            this.scrollY = Math.abs(event.y)
+          }
+          // console.log(this.scrollY)
         })
+        this.foodsScroller.on('scrollEnd', (event) => {
+          this.clickMenu = false
+          // this.scrollY = Math.abs(event.y)
+        })
+
       },
 
       _initTops () {
@@ -114,11 +124,34 @@
       },
 
       clickMenuItem(index) {
-        //console.log(index)
+        console.log(index)
+
+        // 修改标识属性
+        this.clickMenu = true
+        this.scrollY = this.tops[index]
+
         // 滚动的目标li
         const li = this.$refs.foodsDiv.getElementsByClassName('food-list-hook')[index]
         // 平滑滚动到li
         this.foodsScroller.scrollToElement(li, 300)
+
+      },
+
+      updateFoodCount (food, isAdd) {
+        console.log('updateFoodCount() ', isAdd)
+        if(isAdd) { // 增加
+          if(!food.count) { // 第一次
+            // food.count = 1 // 给对象添加新的属性没有数据绑定
+            this.$set(food, 'count', 1)
+          } else {
+            food.count++
+          }
+        } else { // 减少
+          if(food.count) {
+            food.count--
+          }
+
+        }
       }
     },
 
@@ -131,6 +164,10 @@
           return scrollY>=top && scrollY<tops[index+1]
         })
       }
+    },
+
+    components: {
+      cartcontrol
     }
   }
 </script>
