@@ -1,64 +1,65 @@
 <template>
   <transition name="move">
-    <div class="food" v-if="isShow" ref="food">
+    <div class="food" v-show="isShow" ref="food">
       <div class="food-content">
-        <div class="image-header">
-          <img :src="food.image">
-          <div class="back" @click="show(false)">
-            <i class="icon-arrow_lift"></i>
+        <template v-if="isShow">
+          <div class="image-header">
+            <img v-lazy="food.image">
+            <div class="back" @click="show(false)">
+              <i class="icon-arrow_lift"></i>
+            </div>
           </div>
-        </div>
 
-        <div class="content">
-          <h1 class="title">{{food.name}}</h1>
-          <div class="detail">
-            <span class="sell-count">月售{{food.sellCount}}份</span>
-            <span class="rating">好评率{{food.rating}}%</span></div>
-          <div class="price">
-            <span class="now">￥{{food.price}}</span>
-            <span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
+          <div class="content">
+            <h1 class="title">{{food.name}}</h1>
+            <div class="detail">
+              <span class="sell-count">月售{{food.sellCount}}份</span>
+              <span class="rating">好评率{{food.rating}}%</span></div>
+            <div class="price">
+              <span class="now">￥{{food.price}}</span>
+              <span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
+            </div>
+            <div class="cartcontrol-wrapper">
+              <cartcontrol :food="food" :updateFoodCount="updateFoodCount"></cartcontrol>
+            </div>
+            <div class="buy" @click="updateFoodCount(food, true)" v-if="!food.count">加入购物车</div>
           </div>
-          <div class="cartcontrol-wrapper">
-            <cartcontrol :food="food" :updateFoodCount="updateFoodCount"></cartcontrol>
+
+          <split></split>
+
+          <div class="info"><h1 class="title">商品信息</h1>
+            <p class="text">{{food.info}}</p>
           </div>
-          <div class="buy" @click="updateFoodCount(food, true)" v-if="!food.count">加入购物车</div>
-        </div>
 
-        <split></split>
+          <split></split>
 
-        <div class="info"><h1 class="title">商品信息</h1>
-          <p class="text">{{food.info}}</p>
-        </div>
+          <div class="rating">
+            <h1 class="title">商品评价</h1>
 
-        <split></split>
+            <ratingselect :rateType="rateType"
+                          :onlyContent="onlyContent"
+                          :toggleOnlyContent="toggleOnlyContent"
+                          :setRateType="setRateType"
+                          :ratings="food.ratings"
+                          :desc="{all: '全部', positive: '推荐', negative: '吐糟'}"></ratingselect>
 
-        <div class="rating">
-          <h1 class="title">商品评价</h1>
-
-          <ratingselect :rateType="rateType"
-                        :onlyContent="onlyContent"
-                        :toggleOnlyContent="toggleOnlyContent"
-                        :setRateType="setRateType"
-                        :ratings="food.ratings"
-                        :desc="{all: '全部', positive: '推荐', negative: '吐糟'}"></ratingselect>
-
-          <div class="rating-wrapper">
-            <ul>
-              <li class="rating-item border-1px" v-for="rating in filterRatings">
-                <div class="user">
-                  <span class="name">{{rating.username}}</span>
-                  <img width="12" height="12" class="avatar" :src="rating.avatar"></div>
-                <div class="time">{{rating.rateTime}}</div>
-                <p class="text">
-                  <span :class="rating.rateType==0 ? 'icon-thumb_up' : 'icon-thumb_down'"></span>
-                  {{rating.text}}
-                </p>
-              </li>
-            </ul>
-            <div class="no-rating" v-show="filterRatings.length==0">暂无评价</div>
+            <div class="rating-wrapper">
+              <ul>
+                <li class="rating-item border-1px" v-for="rating in filterRatings">
+                  <div class="user">
+                    <span class="name">{{rating.username}}</span>
+                    <img width="12" height="12" class="avatar" :src="rating.avatar"></div>
+                  <div class="time">{{rating.rateTime}}</div>
+                  <p class="text">
+                    <span :class="rating.rateType==0 ? 'icon-thumb_up' : 'icon-thumb_down'"></span>
+                    {{rating.text}}
+                  </p>
+                </li>
+              </ul>
+              <div class="no-rating" v-show="filterRatings.length==0">暂无评价</div>
+            </div>
           </div>
-        </div>
-
+        </template>
       </div>
     </div>
   </transition>
