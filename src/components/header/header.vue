@@ -2,7 +2,7 @@
   <div class="header">
     <div class="content-wrapper">
       <div class="avatar">
-        <img :src="seller.avatar" >
+        <img v-lazy="seller.avatar" >
       </div>
       <div class="content">
         <div class="title">
@@ -164,8 +164,6 @@
             font-weight 200
             line-height 12px
 
-
-
       .supports_count
         position absolute
         right 12px
@@ -216,7 +214,7 @@
       width 100%
       height 100%
       z-index -1
-      &>img
+      img
         width 100%
         height 100%
         filter blur(10px)
@@ -224,9 +222,11 @@
       position fixed
       top: 0
       left 0
+      z-index:100
       background rgba(7,17,27,0.8)
       width 100%
       height 100%
+
       &.fade-enter-active, &.fade-leave-active
         transition opacity .3s
       &.fade-enter, &.fade-leave-to
@@ -249,12 +249,10 @@
             margin-bottom 24px
             display flex
             .line
-              position relative
-              left 0px
-              top: 5px
-              width 110px
-              height 2px
-              background: gray;
+              flex:1
+              position:relative
+              top:-6px
+              border-bottom:2px solid  rgba(255, 192, 203,0.3)
             .text
               margin 0 12px
               font-size 14px

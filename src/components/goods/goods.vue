@@ -19,7 +19,7 @@
             <ul>
               <li class="food-item border-1px" v-for="food in good.foods" @click="showFood(food)">
                 <div class="icon">
-                  <img width="57" height="57" :src="food.icon">
+                  <img width="57" height="57" v-lazy="food.icon">
                 </div>
                 <div class="content">
                   <h2 class="name">{{food.name}}</h2>
@@ -43,7 +43,9 @@
         </ul>
       </div>
       <shopcart :foods="selectedFoods" :deliveryPrice="seller.deliveryPrice"
-          :minPrice="seller.minPrice" :clearCart="clearCart" :updateFoodCount="updateFoodCount"></shopcart>
+          :minPrice="seller.minPrice" :clearCart="clearCart"
+          :updateFoodCount="updateFoodCount"
+          ref="shopcart"></shopcart>
     </div>
     <food :food="food" :updateFoodCount="updateFoodCount" ref="food"></food>
   </div>
@@ -112,7 +114,7 @@
         })
         this.foodsScroller.on('scrollEnd', (event) => {
           this.clickMenu = false
-          // this.scrollY = Math.abs(event.y)
+          this.scrollY = Math.abs(event.y)
         })
 
       },
@@ -146,7 +148,7 @@
 
       },
 
-      updateFoodCount (food, isAdd) {
+      updateFoodCount (food, isAdd, event) {
         console.log('updateFoodCount() ', isAdd)
         if(isAdd) { // 增加
           if(!food.count) { // 第一次
@@ -155,6 +157,9 @@
           } else {
             food.count++
           }
+          // 启动一个小球动画
+          this.$refs.shopcart.startDrop(event.target)
+
         } else { // 减少
           if(food.count) {
             food.count--
