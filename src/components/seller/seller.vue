@@ -1,5 +1,5 @@
 <template>
-  <div class="seller">
+  <div class="seller" ref="seller">
     <div class="seller-content">
       <div class="overview">
         <h1 class="title">{{seller.name}}</h1>
@@ -27,12 +27,48 @@
           <span class="text">收藏</span>
         </div>
       </div>
+      <split></split>
+      <div class="bulletin">
+        <h1 class="title">公告与活动</h1>
+        <div class="content-wrapper border-1px">
+          <p class="content">{{seller.bulletin}}</p>
+        </div>
+        <ul class="supports">
+          <li class="support-item border-1px" v-for="support in seller.supports">
+            <span class="icon" :class="classMap[support.type]"></span>
+            <span class="text">{{support.description}}</span>
+          </li>
+        </ul>
+      </div>
+
+      <split></split>
+
+      <div class="pics">
+        <h1 class="title">商家实景</h1>
+        <div class="pic-wrapper" ref="pics">
+          <ul class="pic-list">
+            <li class="pic-item" v-for="pic in seller.pics">
+              <img width="120" height="90" :src="pic">
+            </li>
+          </ul>
+        </div>
+      </div>
+      <split></split>
+
+      <div class="info">
+        <h1 class="title border-1px">商家信息</h1>
+        <ul>
+          <li class="info-item" v-for="info in seller.infos">{{info}}</li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+  import BScroll from 'better-scroll'
   import star from '../star/star.vue'
+  import split from '../split/split.vue'
 
   export default {
     props: {
@@ -41,19 +77,62 @@
 
     data () {
       return {
-        favorite: localStorage.getItem('favorite')==='true'
+        favorite: localStorage.getItem('favorite') === 'true'
       }
     },
+    // 解析模拟之前才执行, 在此不能引用到模板中的标签
+    created () {
+      // 不能在mounted中执行(在解析模块之后执行),
+      this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee']
+    },
+
+    // 解析模拟之后才执行, 在此才能引用到模板中的标签
+    mounted () {
+      if(!this.seller.pics) {
+        return
+      }
+      this._initScroll()
+    },
+
+    watch: {
+      seller (value) {
+        console.log('seller更新了')
+        this._initScroll()
+      }
+    },
+
 
     methods: {
       toggleFavorite () {
         this.favorite = !this.favorite
         // 保存当前值
         localStorage.setItem('favorite', this.favorite)
+      },
+
+      _initScroll () {
+        // 动态给ul指定宽度
+        const ul = this.$refs.pics.children[0]
+        const liWidth = 120
+        const space = 6
+        const liCount = this.seller.pics.length
+        ul.style.width = (liWidth + space) * liCount - space + 'px'
+
+        this.$nextTick(() => {
+          this.scroll = new BScroll(this.$refs.seller, {
+            click: true
+          })
+          this.picsScroll = new BScroll(this.$refs.pics, {
+            click: true,
+            scrollX: true //水平滚动
+          })
+        })
       }
     },
 
-    components: {star}
+    components: {
+      star,
+      split
+    }
   }
 </script>
 
