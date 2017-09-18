@@ -49,7 +49,7 @@
                   <div class="user">
                     <span class="name">{{rating.username}}</span>
                     <img width="12" height="12" class="avatar" :src="rating.avatar"></div>
-                  <div class="time">{{rating.rateTime}}</div>
+                  <div class="time">{{rating.rateTime | date-string}}</div>
                   <p class="text">
                     <span :class="rating.rateType==0 ? 'icon-thumb_up' : 'icon-thumb_down'"></span>
                     {{rating.text}}

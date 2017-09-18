@@ -63,10 +63,10 @@
     text-align center
     .star-item
       display inline-block
-      width 22px
-      height 22px
+      width 15px
+      height 15px
       background-repeat no-repeat
-      background-size 22px 22px
+      background-size 15px 15px
     .on
       bg-star(star36_on)
 
@@ -79,10 +79,10 @@
     text-align center
     .star-item
       display inline-block
-      width 20px
-      height 20px
+      width 22px
+      height 22px
       background-repeat no-repeat
-      background-size 20px 20px
+      background-size 22px 22px
     .on
       bg-star(star48_on)
 
