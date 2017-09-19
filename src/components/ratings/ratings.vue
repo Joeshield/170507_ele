@@ -1,68 +1,72 @@
 <template>
   <div class="ratings" ref="ratings">
-    <div class="ratings-content">
-      <div class="overview">
-        <div class="overview-left">
-          <h1 class="score">{{seller.score}}</h1>
-          <div class="title">综合评分</div>
-          <div class="rank">高于周边商家{{seller.rankRate}}%</div>
-        </div>
-        <div class="overview-right">
-          <div class="score-wrapper">
-            <span class="title">服务态度</span>
-            <star :score="seller.serviceScore" :size="36"></star>
-            <span class="score">{{seller.serviceScore}}</span>
-          </div>
-          <div class="score-wrapper">
-            <span class="title">商品评分</span>
-            <star :score="seller.foodScore" :size="36"></star>
-            <span class="score">{{seller.foodScore}}</span></div>
-          <div class="delivery-wrapper">
-            <span class="title">送达时间</span>
-            <span class="delivery">{{seller.deliveryTime}}分钟</span>
-          </div>
-        </div>
-      </div>
 
-      <split></split>
-
-      <ratingselect :rateType="rateType"
-                    :onlyContent="onlyContent"
-                    :toggleOnlyContent="toggleOnlyContent"
-                    :setRateType="setRateType"
-                    :ratings="ratings"
-                    :desc="{all: '全部', positive: '满意', negative: '不满意'}"></ratingselect>
-
-      <div class="rating-wrapper">
-        <ul>
-          <li class="rating-item" v-for="rating in filterRatings">
-            <div class="avatar">
-              <img width="28" height="28" v-lazy="rating.avatar">
+      <div class="ratings-content">
+        <scroller>
+          <div class="overview">
+            <div class="overview-left">
+              <h1 class="score">{{seller.score}}</h1>
+              <div class="title">综合评分</div>
+              <div class="rank">高于周边商家{{seller.rankRate}}%</div>
             </div>
-            <div class="content">
-              <h1 class="name">{{rating.username}}</h1>
-              <div class="star-wrapper">
-                <star :score="rating.score" :size="24"></star>
-                <span class="delivery">{{rating.deliveryTime}}</span>
+            <div class="overview-right">
+              <div class="score-wrapper">
+                <span class="title">服务态度</span>
+                <star :score="seller.serviceScore" :size="36"></star>
+                <span class="score">{{seller.serviceScore}}</span>
               </div>
-              <p class="text">{{rating.text}}</p>
-              <div class="recommend">
-                <span :class="rating.rateType==0 ? 'icon-thumb_up' : 'icon-thumb_down'"></span>
-                <span class="item" v-for="item in rating.recommend">{{item}}</span>
-              </div>
-              <div class="time">
-                {{rating.rateTime | date-string}}
+              <div class="score-wrapper">
+                <span class="title">商品评分</span>
+                <star :score="seller.foodScore" :size="36"></star>
+                <span class="score">{{seller.foodScore}}</span></div>
+              <div class="delivery-wrapper">
+                <span class="title">送达时间</span>
+                <span class="delivery">{{seller.deliveryTime}}分钟</span>
               </div>
             </div>
-          </li>
-        </ul>
+          </div>
+
+          <split></split>
+
+          <ratingselect :rateType="rateType"
+                        :onlyContent="onlyContent"
+                        :toggleOnlyContent="toggleOnlyContent"
+                        :setRateType="setRateType"
+                        :ratings="ratings"
+                        :desc="{all: '全部', positive: '满意', negative: '不满意'}"></ratingselect>
+
+          <div class="rating-wrapper">
+            <ul>
+              <li class="rating-item" v-for="rating in filterRatings">
+                <div class="avatar">
+                  <img width="28" height="28" v-lazy="rating.avatar">
+                </div>
+                <div class="content">
+                  <h1 class="name">{{rating.username}}</h1>
+                  <div class="star-wrapper">
+                    <star :score="rating.score" :size="24"></star>
+                    <span class="delivery">{{rating.deliveryTime}}</span>
+                  </div>
+                  <p class="text">{{rating.text}}</p>
+                  <div class="recommend">
+                    <span :class="rating.rateType==0 ? 'icon-thumb_up' : 'icon-thumb_down'"></span>
+                    <span class="item" v-for="item in rating.recommend">{{item}}</span>
+                  </div>
+                  <div class="time">
+                    {{rating.rateTime | date-string}}
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </scroller>
       </div>
-    </div>
+
   </div>
 </template>
 
 <script>
-  import BScroll from 'better-scroll'
+//  import BScroll from 'better-scroll'
   import axios from 'axios'
   import star from '../star/star.vue'
   import split from '../split/split.vue'
@@ -88,11 +92,11 @@
           if (result.code === 0) {
             this.ratings = result.data
 
-            this.$nextTick(() => {
+            /*this.$nextTick(() => {
               this.scroll = new BScroll(this.$refs.ratings, {
                 click: true
               })
-            })
+            })*/
           }
         })
     },
@@ -101,17 +105,17 @@
       toggleOnlyContent () {// 需要传给ratingselect组件的方法
         this.onlyContent = !this.onlyContent
         // 异步刷新scroll
-        this.$nextTick(() => {
+        /*this.$nextTick(() => {
           this.scroll.refresh()
-        })
+        })*/
       },
 
       setRateType (rateType) {// 需要传给ratingselect组件的方法
         this.rateType = rateType
         // 异步刷新scroll
-        this.$nextTick(() => {
+        /*this.$nextTick(() => {
           this.scroll.refresh()
-        })
+        })*/
       }
     },
 

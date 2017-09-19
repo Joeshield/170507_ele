@@ -52,6 +52,7 @@
 </template>
 
 <script>
+  import { MessageBox, Toast} from 'mint-ui'
   import axios from 'axios'
   import BScroll from 'better-scroll'
 
@@ -169,8 +170,16 @@
       },
 
       clearCart () {
-        this.selectedFoods.forEach(food => {
-          food.count = 0
+        MessageBox.confirm('确定清空购物车吗?').then(action => {
+          if(action=='confirm') {
+            this.selectedFoods.forEach(food => {
+                food.count = 0
+            })
+            Toast('清除成功!');
+          }
+        }, action => {
+          //alert('----')
+          console.log('你取消了')
         })
       },
 
